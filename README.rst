@@ -63,7 +63,7 @@ In your VCL you could then use this vmod along the following lines::
     import test304;
 
     sub vcl_deliver {
-	if (test304.test304()) {
+	if (test304.is_304()) {
 	    set resp.http.foo = "this is a 304";
 	}
     }

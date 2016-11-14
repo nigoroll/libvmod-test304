@@ -7,7 +7,7 @@
 #include "vcc_test304_if.h"
 
 VCL_BOOL
-vmod_test304(VRT_CTX)
+vmod_is_304(VRT_CTX)
 {
 	struct req *req;
 

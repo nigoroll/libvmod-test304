@@ -36,7 +36,7 @@ The ``304`` logic in Varnish depends on whether or not any of the relevant
 headers were altered in ``vcl_deliver``, so in general we can't know until
 after vcl_deliver if this response will end up as a ``304``.
 
-To rely on the result from the ``test304()`` function, you must not
+To rely on the result from the ``is_304()`` function, you must not
 alter either of the following after the call::
 
       req.http.If-Modified-Since
@@ -48,13 +48,13 @@ off ``resp.http.Etag`` or ``resp.http.Last-Modified`` in
 ``vcl_deliver`` will prevent the client from seeing these, but will
 not prevent Varnish from serving a ``304``.
 
-$Function BOOL test304()
+$Function BOOL is_304()
 
 Returns ``true`` if this response will end up as a ``304``. Do not
 invoke this from outside of ``vcl_deliver``.  Example::
 
     sub vcl_deliver {
-	if (test304.test304()) {
+	if (test304.is_304()) {
 	    set resp.http.foo = "this is a 304";
 	}
     }
