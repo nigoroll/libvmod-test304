@@ -8,8 +8,8 @@ server s1 {
 	    -body "11111\n"
 } -start
 
-varnish v1 -vcl+backend { 
-	import test304 from "${vmod_topbuild}/src/.libs/libvmod_test304.so";
+varnish v1 -vcl+backend {
+	import ${vmod_test304};
 
 	sub vcl_deliver {
 		if (test304.test304()) {
@@ -50,6 +50,6 @@ client c1 {
 	expect resp.http.is-304 == 1
 	expect resp.status == 304
 	expect resp.http.etag == "foo"
-} 
+}
 
 client c1 -run

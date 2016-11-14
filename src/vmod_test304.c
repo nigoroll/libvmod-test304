@@ -1,20 +1,29 @@
 #include <stdlib.h>
 
+#include "vcl.h"
 #include "vrt.h"
-#include "bin/varnishd/cache.h"
+#include "cache/cache.h"
 
-#include "vcc_if.h"
+#include "vcc_test304_if.h"
 
-int
-init_function(struct vmod_priv *priv, const struct VCL_conf *conf)
+VCL_BOOL
+vmod_test304(VRT_CTX)
 {
-	return (0);
-}
+	struct req *req;
 
-unsigned __match_proto__() 
-vmod_test304(struct sess *sp)
-{
-	return (sp->obj->response == 200 &&
-	    sp->http->conds &&
-	    RFC2616_Do_Cond(sp));
+	CHECK_OBJ_NOTNULL(ctx, VRT_CTX_MAGIC);
+
+	req = ctx->req;
+	CHECK_OBJ_NOTNULL(req, REQ_MAGIC);
+
+	if (ctx->method != VCL_MET_DELIVER) {
+		VSLb(ctx->vsl, SLT_VCL_Error,
+		    "vmod test304 can only be used in vcl_deliver {}");
+		return (0);
+	}
+
+	return (!(req->objcore->flags & OC_F_PASS)
+	    && req->esi_level == 0
+	    && http_IsStatus(req->resp, 200)
+	    && req->http->conds && RFC2616_Do_Cond(req));
 }

@@ -1,28 +1,28 @@
-AM_CPPFLAGS = -I$(VARNISHSRC)/include -I$(VARNISHSRC)
+AM_CFLAGS = $(VARNISHAPI_CFLAGS) -Wall -Werror
+AM_LDFLAGS = $(VARNISHAPI_LIBS) $(VMOD_LDFLAGS) $(CODE_COVERAGE_LDFLAGS)
 
-vmoddir = $(VMODDIR)
 vmod_LTLIBRARIES = libvmod_test304.la
 
-libvmod_test304_la_LDFLAGS = -module -export-dynamic -avoid-version -shared
-
 libvmod_test304_la_SOURCES = \
-	vcc_if.c \
-	vcc_if.h \
 	vmod_test304.c
 
-vcc_if.c vcc_if.h: $(VARNISHSRC)/lib/libvmod_std/vmod.py $(top_srcdir)/src/vmod_test304.vcc
-	@PYTHON@ $(VARNISHSRC)/lib/libvmod_std/vmod.py $(top_srcdir)/src/vmod_test304.vcc
+nodist_libvmod_test304_la_SOURCES = \
+	vcc_test304_if.c \
+	vcc_test304_if.h
 
-VMOD_TESTS = tests/*.vtc
-.PHONY: $(VMOD_TESTS)
+dist_man_MANS = vmod_test304.3
 
-tests/*.vtc:
-	$(VARNISHSRC)/bin/varnishtest/varnishtest -Dvarnishd=$(VARNISHSRC)/bin/varnishd/varnishd -Dvmod_topbuild=$(abs_top_builddir) $@
+@BUILD_VMOD_TEST304@
 
-check: $(VMOD_TESTS)
+AM_TESTS_ENVIRONMENT = \
+	PATH="$(VMOD_TEST_PATH)" \
+	LD_LIBRARY_PATH="$(VARNISH_LIBRARY_PATH)"
+TEST_EXTENSIONS = .vtc
+VTC_LOG_COMPILER = varnishtest -v
+AM_VTC_LOG_FLAGS = -Dvmod_test304="$(VMOD_TEST304)"
+
+TESTS = @VMOD_TESTS@
 
 EXTRA_DIST = \
 	vmod_test304.vcc \
 	$(VMOD_TESTS)
-
-CLEANFILES = $(builddir)/vcc_if.c $(builddir)/vcc_if.h

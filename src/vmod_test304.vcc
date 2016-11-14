@@ -1,3 +1,60 @@
-Module test304
-Init init_function
-Function BOOL test304()
+#
+# Copyright (c) 2011 Varnish Software
+# Copyright 2016 UPLEX Nils Goroll Systemoptimierung
+#
+# Authors:
+# * Dag Haavi Finstad, Varnish Software, 2011
+# * Nils Goroll, UPLEX, 2016
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL AUTHOR OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+
+$Module test304 3 Test for 304 responses in vcl_deliver
+
+Lets you detect if the current response will end up as a ``304 Not
+Modified``. Must only be used in ``vcl_deliver``.
+
+The ``304`` logic in Varnish depends on whether or not any of the relevant
+headers were altered in ``vcl_deliver``, so in general we can't know until
+after vcl_deliver if this response will end up as a ``304``.
+
+To rely on the result from the ``test304()`` function, you must not
+alter either of the following after the call::
+
+      req.http.If-Modified-Since
+      req.http.If-None-Match
+
+Varnish uses the headers of the fetched object (not the copy in
+``resp.http.*``) when deciding if it will do a ``304``, so stripping
+off ``resp.http.Etag`` or ``resp.http.Last-Modified`` in
+``vcl_deliver`` will prevent the client from seeing these, but will
+not prevent Varnish from serving a ``304``.
+
+$Function BOOL test304()
+
+Returns ``true`` if this response will end up as a ``304``. Do not
+invoke this from outside of ``vcl_deliver``.  Example::
+
+    sub vcl_deliver {
+	if (test304.test304()) {
+	    set resp.http.foo = "this is a 304";
+	}
+    }
