@@ -28,7 +28,7 @@ AC_ARG_WITH([rst2man],
 
 m4_ifndef([VARNISH_PREREQ], AC_MSG_ERROR([Need varnish.m4 -- see README.rst]))
 
-VARNISH_PREREQ([5.0], [5.1])
+VARNISH_PREREQ([5.0], [5.1], [trunk])
 VARNISH_VMODS([test304])
 
 VMOD_TESTS="$(cd $srcdir/src && echo tests/*.vtc)"
