@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 #include "cache/cache.h"
-#include "vrt.h"
 #include "vcl.h"
 
 #include "vcc_test304_if.h"
