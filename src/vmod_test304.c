@@ -22,7 +22,7 @@ vmod_is_304(VRT_CTX)
 		return (0);
 	}
 
-	return (!(req->objcore->flags & OC_F_PASS)
+	return (!(req->objcore->flags & OC_F_HFP)
 	    && req->esi_level == 0
 	    && http_IsStatus(req->resp, 200)
 	    && req->http->conds && RFC2616_Do_Cond(req));
